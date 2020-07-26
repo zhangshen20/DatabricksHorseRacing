@@ -61,7 +61,7 @@ from pyspark.sql.functions import *
 formRawDF = (spark.readStream
              .format("json")
              .schema(formSchema)
-             .load("/mnt/gamble/HorseRacing/JSON/20??-??-??/Races_????-??-??.JSON")
+             .load("/mnt/gamble/HorseRacing/JSON/20??-??-??/Races_????-??-??_*.JSON")
              .select(input_file_name().alias("fileName"), regexp_replace(input_file_name(), 'dbfs:/mnt/gamble/HorseRacing/JSON/(\d\d\d\d-\d\d-\d\d)/.*', "$1").alias("meetingDate"), "*")
 )
 
