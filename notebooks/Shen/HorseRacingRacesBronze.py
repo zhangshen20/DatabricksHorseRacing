@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md 
 # MAGIC 
-# MAGIC ## Load Meetings' data from JSON files into Lake House (Delta)
+# MAGIC ## Load Races' data from JSON files into Lake House (Delta)
 
 # COMMAND ----------
 
