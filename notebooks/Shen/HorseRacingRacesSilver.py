@@ -66,8 +66,7 @@ racesDF = (
   col("races.results").alias("results"),
   col("races.pools").alias("pools"),
   col("races.skyRacing.audio").alias("skyRacing_audio"),
-  col("races.skyRacing.previewVideo").alias("skyRacing_previewVideo"),
-  col("races.raceStatus").alias("raceStatus")
+  col("races.skyRacing.previewVideo").alias("skyRacing_previewVideo")
 )
 )
 
