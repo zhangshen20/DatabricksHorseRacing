@@ -67,10 +67,6 @@ formRawDF = (spark.readStream
 
 # COMMAND ----------
 
-display(formRawDF)
-
-# COMMAND ----------
-
 (formRawDF.writeStream
  .trigger(once=True)
  .format("delta")
