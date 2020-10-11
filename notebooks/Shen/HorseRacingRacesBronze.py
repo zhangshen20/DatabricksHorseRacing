@@ -77,4 +77,10 @@ formRawDF = (spark.readStream
 
 # COMMAND ----------
 
+while spark.streams.active != []:
+  print("Waiting for streaming '%s' to finish." % BronzeDataPath)
+  time.sleep(5)
+
+# COMMAND ----------
+
 spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
