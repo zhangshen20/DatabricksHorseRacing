@@ -82,4 +82,10 @@ oneRacePredictionsDF = (
 
 # COMMAND ----------
 
+while spark.streams.active != []:
+  print("Waiting for streaming '%s' to finish." % SilverDataPath)
+  time.sleep(5)
+
+# COMMAND ----------
+
 spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
