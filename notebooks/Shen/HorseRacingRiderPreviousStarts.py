@@ -85,3 +85,7 @@ riderPreviousStartsDF = (
   .outputMode("append")
   .option("checkpointLocation", "%s" % SilverCheckPointPath)
   .start("%s" % SilverDataPath))
+
+# COMMAND ----------
+
+spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
