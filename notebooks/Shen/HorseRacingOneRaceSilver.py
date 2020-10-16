@@ -15,9 +15,9 @@ DataSetName = "OneRace"
 
 # BROZNE SETTING 
 BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
-BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT/OneRaceV2"
+BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
 BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, DataSetName)
+BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "OneRaceV2")
 BronzeTableName = 'Bronze' + DataSetName
 
 # SILVE SETTING
