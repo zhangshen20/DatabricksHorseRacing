@@ -11,6 +11,12 @@
 
 # COMMAND ----------
 
+from pyspark.sql.functions import udf, col, from_unixtime, from_utc_timestamp, from_json
+from pyspark.sql.types import StringType, StructField, StructType
+import json, time, requests
+
+# COMMAND ----------
+
 MOUNT_NAME = "gamble"
 MOUNT_PATH = "/mnt/%s" % MOUNT_NAME
 
@@ -23,20 +29,9 @@ DataSetName = "RunnerStarts"
 BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
 BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
 BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, DataSetName)
+BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "RunnerStartsV2")
 BronzeTableName = 'Bronze' + DataSetName
 
-
-# COMMAND ----------
-
-# dbutils.fs.help()
-
-# INIT ... 
-
-# dbutils.fs.rm(BronzeDataPath, True)
-# dbutils.fs.rm(BronzeCheckPointPath, True)
-# dbutils.fs.rm(SilverDataPath, True)
-# dbutils.fs.rm(SilverCheckPointPath, True)
 
 # COMMAND ----------
 
@@ -50,7 +45,7 @@ meetingDate = '2020-06-03' # THIS CAN BE ANY MEETING DATE
 
 sampleDF = (spark.read.option("inferSchema","true")
           .option("header","true")
-          .json("/mnt/gamble/HorseRacing/JSON/%s/OneRace_Form_????-??-??_*_*_R.JSON" % meetingDate)
+          .json("/mnt/gamble/HorseRacing/JSON/Databricks/OneRaceForm/OneRace_Form_2020-10-17_CAULFIELD_9_R.JSON")
            )
 
 # COMMAND ----------
@@ -72,8 +67,8 @@ from pyspark.sql.functions import *
 formRawDF = (spark.readStream
              .format("json")
              .schema(formSchema)
-             .load("/mnt/gamble/HorseRacing/JSON/20??-??-??/OneRace_Form_????-??-??_*_*_R.JSON")
-             .select(input_file_name().alias("fileName"), regexp_replace(input_file_name(), 'dbfs:/mnt/gamble/HorseRacing/JSON/(\d\d\d\d-\d\d-\d\d)/.*', "$1").alias("meetingDate"), "*")
+             .load("/mnt/gamble/HorseRacing/JSON/Databricks/OneRaceForm/")
+             .select(input_file_name().alias("fileName"), regexp_replace(input_file_name(), 'dbfs:/mnt/gamble/HorseRacing/JSON/Databricks/OneRaceForm/OneRace_Form_(\d\d\d\d-\d\d-\d\d)_.*.JSON', "$1").alias("meetingDate"), "*")
 )
 
 # COMMAND ----------
@@ -85,3 +80,13 @@ formRawDF = (spark.readStream
  .option("checkpointLocation", "%s" % BronzeCheckPointPath)
  .start("%s" % BronzeDataPath)
 )
+
+# COMMAND ----------
+
+while spark.streams.active != []:
+  print("Waiting for streaming query to finish.")
+  time.sleep(5)
+
+# COMMAND ----------
+
+spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
