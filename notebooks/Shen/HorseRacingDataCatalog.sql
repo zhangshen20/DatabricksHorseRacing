@@ -203,9 +203,8 @@ from  Temp_view_Meetings as L
 -- MAGIC 
 -- MAGIC (spark.table("Temp_view_RunnerMaster")
 -- MAGIC   .write
--- MAGIC   .format("delta")
--- MAGIC   .mode("append")
--- MAGIC   .option("checkpointLocation", GoldCheckPointPath)
+-- MAGIC   .mode("overwrite") 
+-- MAGIC   .format("parquet")
 -- MAGIC   .save(GoldDataPath)
 -- MAGIC )
 
