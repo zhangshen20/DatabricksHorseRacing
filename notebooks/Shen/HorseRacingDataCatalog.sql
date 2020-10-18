@@ -1,72 +1,32 @@
 -- Databricks notebook source
-describe delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique`
-
--- COMMAND ----------
-
--- MAGIC %sh 
--- MAGIC 
--- MAGIC rm -R /dbfs/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique
-
--- COMMAND ----------
-
--- MAGIC %sh 
--- MAGIC rm -R /dbfs/mnt/gamble/DELTA/SILVER/CHECKPOINT/RunnerPreviousStartsUnique
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_OneRaceRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_Meetings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/Meetings`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_OneRace AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRace`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_OneRacePredictions AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_OneRaceRatings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings`
-
--- COMMAND ----------
-
-use HorseRacing
+USE HorseRacing
 ;
--- select * from view_OneRaceRunner limit 100
--- ;
--- select raceNumber, * from view_Meetings limit 100
--- ;
--- select raceNumber, * from view_OneRace limit 100
--- ;
--- select *
--- from view_Meetings L 
--- --       LEFT OUTER JOIN view_OneRace as R
---       INNER JOIN view_OneRace R
---         on L.meetingName = R.meetingName and L.meetingDate = R.meetingDate and L.raceType = R.raceType and L.raceNumber = R.raceNumber
--- limit 100      
-
--- select * from view_OneRacePredictions limit 100
--- select * from view_OneRaceRatings limit 100
--- ;
-
--- COMMAND ----------
-
--- MAGIC %python
--- MAGIC 
--- MAGIC DFTemp = spark.sql("select * from   view_OneRaceRatings ")
+Create OR Replace view HorseRacing.view_OneRaceRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner`
+;
+Create OR Replace view HorseRacing.view_Meetings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/Meetings`
+;
+Create OR Replace view HorseRacing.view_OneRace AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRace`
+;
+Create OR Replace view HorseRacing.view_OneRacePredictions AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions`
+;
+Create OR Replace view HorseRacing.view_OneRaceRatings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings`
+;
+Create OR Replace view HorseRacing.view_RunnerPreviousStartsUnique AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique`
+;
+Create OR Replace view HorseRacing.view_RunnerStarts AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts`
+;
+Create OR Replace view HorseRacing.view_OneRaceResultRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner`
+;
+Create OR Replace view HorseRacing.view_RunnerWinningDistance AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance`
+;
 
 -- COMMAND ----------
 
 -- MAGIC %python
 -- MAGIC 
 -- MAGIC from pyspark.sql.functions import *
--- MAGIC 
 -- MAGIC (
--- MAGIC spark.sql("select * from view_OneRacePredictions")
+-- MAGIC spark.sql("select * from HorseRacing.view_OneRacePredictions")
 -- MAGIC   .select("raceNumber", "raceName", "meetingName", "meetingDate", col("predictions_betType").alias("predictions_betTypeRaw"), "predictions_runners_runnerNumber", "predictions_runners_probability")
 -- MAGIC   .withColumn("predictions_betType", concat(lit("prediction_"), col("predictions_betTypeRaw"), lit("_probability")))
 -- MAGIC   .groupby("raceNumber", "raceName", "meetingName", "meetingDate", "predictions_runners_runnerNumber", )
@@ -78,16 +38,12 @@ use HorseRacing
 
 -- COMMAND ----------
 
-select * from view_OneRacePredictionsTemp
-
--- COMMAND ----------
-
 -- MAGIC %python
 -- MAGIC 
 -- MAGIC from pyspark.sql.functions import *
 -- MAGIC 
 -- MAGIC (
--- MAGIC spark.sql("select * from view_OneRaceRatings ")
+-- MAGIC spark.sql("select * from HorseRacing.view_OneRaceRatings ")
 -- MAGIC     .select("raceNumber", "raceName", "meetingName", "meetingDate", concat(lit("rating_"), col("ratingType")).alias("ratingType"), posexplode("ratingRunnerNumbers").alias("ratingsRaw", "runnerNumber"))
 -- MAGIC     .withColumn("ratings", col("ratingsRaw")+1)
 -- MAGIC     .groupBy("raceNumber", "raceName", "meetingName", "meetingDate", "runnerNumber")
@@ -98,33 +54,10 @@ select * from view_OneRacePredictionsTemp
 
 -- COMMAND ----------
 
-select *
-from view_OneRaceRatingsTemp
+Create OR Replace view HorseRacing.view_RunnerPreviousStartsRowNumber AS 
+  select row_number() over (partition by meetingDate, runnerName order by startDate desc) as Ord, * 
+  from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStarts`
 
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_OneRaceResultRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_RunnerStarts AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_RunnerPreviousStartsUnique AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique`
-
--- COMMAND ----------
-
-select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique`
-
--- COMMAND ----------
-
-Create OR Replace view HorseRacing.view_RunnerWinningDistance AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance`
-
--- COMMAND ----------
-
-select * from HorseRacing.view_RunnerWinningDistance limit 100
 
 -- COMMAND ----------
 
@@ -133,7 +66,7 @@ select * from HorseRacing.view_RunnerWinningDistance limit 100
 -- MAGIC from pyspark.sql.functions import *
 -- MAGIC 
 -- MAGIC (
--- MAGIC spark.sql("select * from view_RunnerWinningDistance ")
+-- MAGIC spark.sql("select * from HorseRacing.view_RunnerWinningDistance ")
 -- MAGIC     .select("meetingDate", "runnerNumber", "runnerName", "winningDistance", "numberOfWinsAtDistance")
 -- MAGIC #     .withColumn("ratings", col("ratingsRaw")+1)
 -- MAGIC     .groupBy("meetingDate", "runnerNumber", "runnerName")
@@ -141,10 +74,6 @@ select * from HorseRacing.view_RunnerWinningDistance limit 100
 -- MAGIC     .agg(min("numberOfWinsAtDistance"))
 -- MAGIC     .createOrReplaceTempView("view_RunnerWinningDistanceTemp")
 -- MAGIC )
-
--- COMMAND ----------
-
-select * from view_RunnerWinningDistanceTemp limit 100
 
 -- COMMAND ----------
 
@@ -195,8 +124,10 @@ select L.allIn, L.allowBundle, R.allowFixedOddsPlace, R.allowMulti, R.allowParim
        R6.trainerStarts_last30Days_numberOfPlacings, R6.trainerStarts_last30Days_numberOfStarts, R6.trainerStarts_last30Days_numberOfWins, R6.trainerStarts_region_numberOfPlacings,
        R6.trainerStarts_region_numberOfStarts, R6.trainerStarts_region_numberOfWins, R6.trainerStarts_track_numberOfPlacings, R6.trainerStarts_track_numberOfStarts, R6.trainerStarts_track_numberOfWins,
        R7.startType, R7.finishingPosition as finishingPositionUpdated, R7.numberOfStarters, R7.draw, R7.margin, R7.distance, R7.class, R7.handicap, R7.startingPosition,
-       R7.odds, R7.winnerOrSecond, R7.positionInRun, R7.time as RunnerRunTime, R7.stewardsComment
-from view_Meetings as L 
+       R7.odds, R7.winnerOrSecond, R7.positionInRun, R7.time as RunnerRunTime, R7.stewardsComment, 
+       R8.startingPosition as startingPositionPrevious1, R8.finishingPosition as finishingPositionPrevious1, R8.positionInRun as positionInRunPrevious1,
+       R9.startingPosition as startingPositionPrevious2, R9.finishingPosition as finishingPositionPrevious2, R9.positionInRun as positionInRunPrevious2
+from  view_Meetings as L 
       LEFT OUTER JOIN view_OneRace as R
        on L.meetingName = R.meetingName and L.meetingDate = R.meetingDate and L.raceType = R.raceType and L.raceNumber = R.raceNumber
       LEFT OUTER JOIN view_OneRaceRunner as R2 
@@ -210,7 +141,12 @@ from view_Meetings as L
       LEFT OUTER JOIN view_RunnerStarts as R6
        on L.meetingDate = R6.meetingDate and R2.runnerNumber = R6.runnerNumber and R2.runnerName = R6.runnerName and R2.trainerFullName = R6.trainerName
       LEFT OUTER JOIN view_RunnerPreviousStartsUnique as R7
-       on L.meetingDate = R7.startDate and L.raceNumber = R7.raceNumber and R2.runnerNumber = R7.runnerNumber and R2.runnerName = R7.runnerName
+       on L.meetingDate = R7.startDate and L.raceNumber = R7.raceNumber and R2.runnerName = R7.runnerName
+      LEFT OUTER JOIN HorseRacing.view_RunnerPreviousStartsRowNumber as R8
+       on L.meetingDate = R8.meetingDate and R2.runnerNumber = R8.runnerNumber and R2.runnerName = R8.runnerName and R8.Ord = 1
+      LEFT OUTER JOIN HorseRacing.view_RunnerPreviousStartsRowNumber as R9
+       on L.meetingDate = R9.meetingDate and R2.runnerNumber = R9.runnerNumber and R2.runnerName = R9.runnerName and R9.Ord = 2
+       
       
 -- where R3.prediction_Win_probability is not null
 --   and L.meetingDate = "2020-06-06"
@@ -219,22 +155,103 @@ from view_Meetings as L
 
 -- COMMAND ----------
 
-select meetingDate, meetingName, location, raceNumber, runnerName, runnerNumber, 
-       finishingPosition,  last5Starts,
-       techFormRating, prediction_Place_probability, prediction_Win_probability, fixedOdds_returnWinOpenDaily, fixedOdds_returnWin_close,
+-- select meetingDate, meetingName, location, raceNumber, runnerNumber, runnerName, 
+--        fixedOdds_returnWinOpen,
+--        fixedOdds_returnWin_close,
+--        finishingPosition, 
        
-       numberOfFixedOddsPlaces, numberOfPlaces, prizeMoney, raceClassConditions, raceDistance,  raceStartTime, raceType, 
-       tipRunnerNumbers, tipster, tipType, trackCondition, trackDirection, weatherCondition, barrierNumber, dfsFormRating, earlySpeedRating, earlySpeedRatingBand,
-       fixedOdds_returnWinOpen,  handicapWeight, riderDriverName, trainerName, 
+--        daysSinceLastRun,        
        
-       rating_Class, rating_Distance, rating_Last12Months, rating_Overall, rating_Rating, rating_Recent, rating_Time,
+--        positionInRunPrevious1,
+--        finishingPositionPrevious1,
+--        positionInRunPrevious2,
+--        finishingPositionPrevious2,
+       
+--        last5Starts,
+--        last20Starts,              
+--        odds,        
+--        startingPosition,        
+--        positionInRun, 
+--        RunnerRunTime, 
+--        finishingPositionUpdated, 
+--        numberOfStarters, 
+--        draw, 
+--        margin, 
+--        distance, 
+--        class, 
+--        handicap, 
+--        winnerOrSecond, 
+--        stewardsComment,       
+       
+--        age, 
+--        blinkers, 
+--        classLevel, 
+--        colour, 
+--        dam, 
+--        sex, 
+--        sire, 
+--        trainerLocation,       
+-- --        daysSinceLastRun, 
+--        fieldStrength, 
+--        formComment,       
+       
+-- --     Tips & Form & Rating
+--        techFormRating, 
+--        prediction_Place_probability, 
+--        prediction_Win_probability, 
+--        tipRunnerNumbers, 
+--        tipster, 
+--        tipType, 
+--        dfsFormRating, 
+--        earlySpeedRating, 
+--        earlySpeedRatingBand,       
+--        rating_Class, 
+--        rating_Distance, 
+--        rating_Last12Months, 
+--        rating_Overall, 
+--        rating_Rating, 
+--        rating_Recent, 
+--        rating_Time,       
+-- --     Tips & Form END
 
-       fixedOdds_placeDeduction, fixedOdds_returnPlace_close, fixedOdds_scratchedTime, resultedTime, 
-       age, blinkers, classLevel, colour, dam, daysSinceLastRun, fieldStrength, formComment,
-       last20Starts,
-       sex, sire, trainerLocation,
-       finishingPositionUpdated, 
-       numberOfStarters, draw, margin, distance, class, handicap, startingPosition, odds, winnerOrSecond, positionInRun, RunnerRunTime, stewardsComment
-from   view_RunnerMasterTemp where meetingDate = "2020-05-29"
---   and  prediction_Win_probability is not null
- and finishingPosition = 1
+-- --     Odds
+--        fixedOdds_returnWinOpenDaily, 
+-- --        fixedOdds_returnWin_close,
+--        numberOfFixedOddsPlaces, 
+--        numberOfPlaces, 
+-- --        fixedOdds_returnWinOpen,  
+--        prizeMoney, 
+--        fixedOdds_placeDeduction, 
+--        fixedOdds_returnPlace_close, 
+--        fixedOdds_scratchedTime, 
+--        resultedTime,        
+-- --     Odds END
+
+-- --     race & meeting & trainer
+--        raceClassConditions, 
+--        raceDistance,  
+--        raceStartTime, 
+--        raceType, 
+--        trackCondition, 
+--        trackDirection, 
+--        weatherCondition, 
+--        barrierNumber, 
+--        handicapWeight, 
+--        riderDriverName, 
+--        trainerName
+-- --     race & meeting & trainer END       
+      
+-- from   view_RunnerMasterTemp 
+-- where last5Starts like '%x_2'
+--   and fixedOdds_returnPlace_close > 4
+-- -- where --meetingDate = "2020-06-01"
+-- -- --   and 
+-- --   finishingPositionPrevious1 > 1
+-- --   and finishingPositionPrevious1 < 5
+-- --   and finishingPositionPrevious1 < finishingPositionPrevious2
+-- --   and positionInRunPrevious1 is not null
+-- -- --   and fixedOdds_returnWin_close > 9
+-- -- --   and meetingName = 'GOLD COAST'
+-- -- --   and raceNumber = 6
+-- -- --   and  prediction_Win_probability is not null
+-- -- --  and finishingPosition = 1
