@@ -20,48 +20,85 @@
 
 -- COMMAND ----------
 
--- USE HorseRacing
--- ;
--- Create OR Replace view HorseRacing.view_OneRaceRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner`
--- ;
--- Create OR Replace view HorseRacing.view_Meetings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/Meetings`
--- ;
--- Create OR Replace view HorseRacing.view_OneRace AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRace`
--- ;
--- Create OR Replace view HorseRacing.view_OneRacePredictions AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions`
--- ;
--- Create OR Replace view HorseRacing.view_OneRaceRatings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings`
--- ;
--- Create OR Replace view HorseRacing.view_RunnerPreviousStartsUnique AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique`
--- ;
--- Create OR Replace view HorseRacing.view_RunnerStarts AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts`
--- ;
--- Create OR Replace view HorseRacing.view_OneRaceResultRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner`
--- ;
--- Create OR Replace view HorseRacing.view_RunnerWinningDistance AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance`
--- ;
+USE HorseRacing
+;
+Create OR Replace temporary view Temp_view_OneRaceRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner`
+;
+Create OR Replace temporary view Temp_view_Meetings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/Meetings`
+;
+Create OR Replace temporary view Temp_view_OneRace AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRace`
+;
+Create OR Replace temporary view Temp_view_OneRacePredictions AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions`
+;
+Create OR Replace temporary view Temp_view_OneRaceRatings AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings`
+;
+Create OR Replace temporary view Temp_view_RunnerPreviousStartsUnique AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique` 
+;
+Create OR Replace temporary view Temp_view_RunnerStarts AS select distinct * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts` -- THIS Data got duplicated records. So we add DISTINCT
+;
+Create OR Replace temporary view Temp_view_OneRaceResultRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner`
+;
+Create OR Replace temporary view Temp_view_RunnerWinningDistance AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance`
+;
 
 -- COMMAND ----------
 
--- MAGIC %python
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner").createOrReplaceTempView("Temp_view_OneRaceRunner"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/Meetings").createOrReplaceTempView("Temp_view_Meetings"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRace").createOrReplaceTempView("Temp_view_OneRace"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions").createOrReplaceTempView("Temp_view_OneRacePredictions"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings").createOrReplaceTempView("Temp_view_OneRaceRatings"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique").createOrReplaceTempView("Temp_view_RunnerPreviousStartsUnique"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts").createOrReplaceTempView("Temp_view_RunnerStarts"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner").createOrReplaceTempView("Temp_view_OneRaceResultRunner"))
--- MAGIC 
--- MAGIC (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance").createOrReplaceTempView("Temp_view_RunnerWinningDistance"))
+# %python
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner").createOrReplaceTempView("Temp_view_OneRaceRunner"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/Meetings").createOrReplaceTempView("Temp_view_Meetings"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRace").createOrReplaceTempView("Temp_view_OneRace"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions").createOrReplaceTempView("Temp_view_OneRacePredictions"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings").createOrReplaceTempView("Temp_view_OneRaceRatings"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique").createOrReplaceTempView("Temp_view_RunnerPreviousStartsUnique"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts").createOrReplaceTempView("Temp_view_RunnerStarts"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner").createOrReplaceTempView("Temp_view_OneRaceResultRunner"))
+
+# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance").createOrReplaceTempView("Temp_view_RunnerWinningDistance"))
+
+
+-- COMMAND ----------
+
+Create OR Replace view Temp_view_RunnerPreviousStarts AS 
+  select distinct * 
+  from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStarts`
+
+-- COMMAND ----------
+
+Create OR Replace view Temp_view_RunnerPreviousStartsRowNumber AS 
+  select row_number() over (partition by meetingDate, runnerName order by startDate desc) as Ord, * 
+  from Temp_view_RunnerPreviousStarts
+
+-- COMMAND ----------
+
+-- TESTING AND DEBUGGING -> Duplicated Record, View, Temp View.
+
+-- select distinct * from temp_view_RunnerStarts where runnerName = 'ALKAASER' -- 2 same record
+-- select * from Temp_view_RunnerPreviousStartsUnique where runnerName = 'ALKAASER' 
+-- select * from Temp_view_RunnerPreviousStartsRowNumber where runnerName = 'ALKAASER' 
+-- select * from Temp_view_RunnerPreviousStartsRowNumber where runnerName = 'ALKAASER' 
+-- select * From Temp_view_RunnerPreviousStartsRowNumber where runnerName = 'ALKAASER' 
+
+-- Create OR Replace temporary view Temp_view_RunnerStarts AS select distinct * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts` 
+-- select *
+-- from Temp_view_RunnerStarts as R6
+-- from Temp_view_RunnerStarts_2 as R6
+-- from HorseRacing.view_RunnerStarts as R6
+--       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsUnique as R7
+--        on R6.meetingDate = R7.startDate and R6.runnerName = R7.runnerName
+--       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsRowNumber as R8
+--        on R6.meetingDate = R8.meetingDate and R6.runnerName = R8.runnerName and R8.Ord = 1
+--       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsRowNumber as R9
+--        on R6.meetingDate = R9.meetingDate and R6.runnerName = R9.runnerName and R9.Ord = 2
+-- where R6.runnerName = 'ALKAASER'        
+       
 
 -- COMMAND ----------
 
@@ -97,13 +134,6 @@
 
 -- COMMAND ----------
 
-Create OR Replace view Temp_view_RunnerPreviousStartsRowNumber AS 
-  select row_number() over (partition by meetingDate, runnerName order by startDate desc) as Ord, * 
-  from delta.`cRunnerPreviousStarts`
-
-
--- COMMAND ----------
-
 -- MAGIC %python
 -- MAGIC 
 -- MAGIC from pyspark.sql.functions import *
@@ -122,7 +152,8 @@ Create OR Replace view Temp_view_RunnerPreviousStartsRowNumber AS
 
 Create OR Replace Temp view Temp_view_RunnerMaster AS
 (
-select L.allIn, L.allowBundle, R.allowFixedOddsPlace, R.allowMulti, R.allowParimutuelPlace, R.apprenticesCanClaim, R.audio, 
+select L.allIn, L.allowBundle, 
+       R.allowFixedOddsPlace, R.allowMulti, R.allowParimutuelPlace, R.apprenticesCanClaim, R.audio, 
 --        R.betTypes, 
        R.broadcastChannel, R.broadcastChannels,
        R.cashOutEligibility, R.fixedOddsOnlineBetting, R.fixedOddsUpdateTime, R.hasEarlySpeedRatings, R.hasFixedOdds, R.hasForm, R.hasParimutuel, R.location, R.meetingDate,
@@ -131,17 +162,15 @@ select L.allIn, L.allowBundle, R.allowFixedOddsPlace, R.allowMulti, R.allowParim
        R.previewVideo, R.prizeMoney, R.raceClassConditions, R.raceDistance, R.raceName, R.raceNumber, R.raceStartTime, R.raceStatus, R.raceType, L.railPosition,
 --        R.ratings, R.results, R.runners, L.scratchings, 
        R.sellCode_meetingCode, R.sellCode_scheduledType, L.skyRacing_audio, L.skyRacing_video, R.substitute, R.tipRunnerNumbers,
-       R.tipster, R.tipType, L.trackCondition, R.trackDirection, R.venueMnemonic, L.weatherCondition, R.willHaveFixedOdds, R2.barrierNumber, R2.claimAmount, R2.dfsFormRating, 
-       R2.earlySpeedRating, R2.earlySpeedRatingBand, R2.emergency, R2.fixedOdds_allowPlace, R2.fixedOdds_bettingStatus, 
+       R.tipster, R.tipType, L.trackCondition, R.trackDirection, R.venueMnemonic, L.weatherCondition, R.willHaveFixedOdds, 
+       R2.barrierNumber, R2.claimAmount, R2.dfsFormRating, R2.earlySpeedRating, R2.earlySpeedRatingBand, R2.emergency, R2.fixedOdds_allowPlace, R2.fixedOdds_bettingStatus, 
 --        R2.fixedOdds_differential, R2.fixedOdds_flucs, 
-       R2.fixedOdds_isFavouritePlace,
-       R2.fixedOdds_isFavouriteWin, R2.fixedOdds_percentageChange, R2.fixedOdds_propositionNumber, R2.fixedOdds_returnPlace, R2.fixedOdds_returnWin, R2.fixedOdds_returnWinOpen, 
-       R2.fixedOdds_returnWinOpenDaily, R2.fixedOdds_returnWinTime, R2.handicapWeight, R2.harnessHandicap, R2.last5Starts, R2.parimutuel_bettingStatus, R2.parimutuel_isFavouriteExact2, 
-       R2.parimutuel_isFavouritePlace, R2.parimutuel_isFavouriteWin, 
+       R2.fixedOdds_isFavouritePlace, R2.fixedOdds_isFavouriteWin, R2.fixedOdds_percentageChange, R2.fixedOdds_propositionNumber, R2.fixedOdds_returnPlace, R2.fixedOdds_returnWin, 
+       R2.fixedOdds_returnWinOpen, R2.fixedOdds_returnWinOpenDaily, R2.fixedOdds_returnWinTime, R2.handicapWeight, R2.harnessHandicap, R2.last5Starts, R2.parimutuel_bettingStatus, 
+       R2.parimutuel_isFavouriteExact2, R2.parimutuel_isFavouritePlace, R2.parimutuel_isFavouriteWin, 
 --        R2.parimutuel_marketMovers, 
-       R2.parimutuel_percentageChange, R2.parimutuel_returnExact2, R2.parimutuel_returnPlace, 
-       R2.parimutuel_returnWin, R2.penalty, R2.riderDriverFullName, R2.riderDriverName, R2.runnerName, R2.runnerNumber, R2.silkURL, R2.tcdwIndicators, R2.techFormRating,
-       R2.totalRatingPoints, R2.trainerFullName, R2.trainerName, R2.vacantBox, 
+       R2.parimutuel_percentageChange, R2.parimutuel_returnExact2, R2.parimutuel_returnPlace, R2.parimutuel_returnWin, R2.penalty, R2.riderDriverFullName, R2.riderDriverName, 
+       R2.runnerName, R2.runnerNumber, R2.silkURL, R2.tcdwIndicators, R2.techFormRating, R2.totalRatingPoints, R2.trainerFullName, R2.trainerName, R2.vacantBox, 
        R3.prediction_Place_probability, R3.prediction_Win_probability,
        R4.rating_Class, R4.rating_Distance, R4.rating_Last12Months, R4.rating_Overall, R4.rating_Rating, R4.rating_Recent, R4.rating_Time,
        R5.finishingPosition, R5.fixedOdds_placeDeduction, R5.fixedOdds_returnPlace as fixedOdds_returnPlace_close, R5.fixedOdds_returnWin as fixedOdds_returnWin_close,
@@ -181,8 +210,8 @@ from  Temp_view_Meetings as L
       LEFT OUTER JOIN Temp_view_OneRaceRatingsTemp as R4
        on L.meetingName = R4.meetingName and L.meetingDate = R4.meetingDate and L.raceNumber = R4.raceNumber and L.raceName = R4.raceName and R2.runnerNumber = R4.runnerNumber
       LEFT OUTER JOIN Temp_view_OneRaceResultRunner as R5
-       on L.meetingName = R5.meetingName and L.meetingDate = R5.meetingDate and L.raceNumber = R5.raceNumber and L.raceType = R5.raceType and R2.runnerNumber = R5.runnerNumber       
-      LEFT OUTER JOIN Temp_view_RunnerStarts as R6
+       on L.meetingName = R5.meetingName and L.meetingDate = R5.meetingDate and L.raceNumber = R5.raceNumber and L.raceType = R5.raceType and R2.runnerNumber = R5.runnerNumber
+      LEFT OUTER JOIN HorseRacing.view_RunnerStarts as R6
        on L.meetingDate = R6.meetingDate and R2.runnerNumber = R6.runnerNumber and R2.runnerName = R6.runnerName and R2.trainerFullName = R6.trainerName
       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsUnique as R7
        on L.meetingDate = R7.startDate and L.raceNumber = R7.raceNumber and R2.runnerName = R7.runnerName
@@ -190,11 +219,6 @@ from  Temp_view_Meetings as L
        on L.meetingDate = R8.meetingDate and R2.runnerNumber = R8.runnerNumber and R2.runnerName = R8.runnerName and R8.Ord = 1
       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsRowNumber as R9
        on L.meetingDate = R9.meetingDate and R2.runnerNumber = R9.runnerNumber and R2.runnerName = R9.runnerName and R9.Ord = 2
-       
-      
--- where R3.prediction_Win_probability is not null
---   and L.meetingDate = "2020-06-06"
-
 )
 
 -- COMMAND ----------
@@ -210,7 +234,19 @@ from  Temp_view_Meetings as L
 
 -- COMMAND ----------
 
--- select * from delta.`/mnt/gamble/DELTA/GOLD/DATA/RunnerMaster` limit 100
+# %python
+# df = spark.read.format('parquet').load("/mnt/gamble/DELTA/GOLD/DATA/RunnerMaster")
+
+-- COMMAND ----------
+
+# %python
+# df.createOrReplaceTempView('temp_testing')
+
+-- COMMAND ----------
+
+-- select *
+-- from temp_testing
+-- where runnerName = 'ALKAASER'
 
 -- COMMAND ----------
 
