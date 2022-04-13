@@ -11,6 +11,12 @@
 
 # COMMAND ----------
 
+from pyspark.sql.functions import udf, col, from_unixtime, from_utc_timestamp, from_json
+from pyspark.sql.types import StringType, StructField, StructType
+import json, time, requests
+
+# COMMAND ----------
+
 DataSetName = "Meetings"
 
 # BROZNE SETTING 
@@ -103,4 +109,10 @@ meetingsDF = (
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+while spark.streams.active != []:
+  print("Waiting for streaming '%s' to finish." % SilverDataPath)
+  time.sleep(5)
+
+# COMMAND ----------
+
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
