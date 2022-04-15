@@ -17,7 +17,7 @@ DataSetName = "OneRace"
 BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
 BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
 BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "OneRaceV2")
+BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "OneRace")
 BronzeTableName = 'Bronze' + DataSetName
 
 # SILVE SETTING
@@ -108,10 +108,12 @@ spark.readStream
 
 # COMMAND ----------
 
+import json, time, requests
+
 while spark.streams.active != []:
   print("Waiting for streaming '%s' to finish." % SilverDataPath)
   time.sleep(5)
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
