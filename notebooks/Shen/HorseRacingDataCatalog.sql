@@ -234,7 +234,13 @@ from  Temp_view_Meetings as L
 
 -- COMMAND ----------
 
-print("This is end of Run for Horse Racing Data Catalog")
+-- MAGIC %python
+-- MAGIC 
+-- MAGIC from datetime import datetime
+-- MAGIC 
+-- MAGIC now = datetime.now()
+-- MAGIC 
+-- MAGIC print(now, " *** This is end of Run for Horse Racing Data Catalog")
 
 -- COMMAND ----------
 
