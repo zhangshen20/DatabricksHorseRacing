@@ -11,21 +11,19 @@
 
 # COMMAND ----------
 
-MOUNT_NAME = "gamble"
-MOUNT_PATH = "/mnt/%s" % MOUNT_NAME
+# MAGIC %run ./includes/configuration
 
-HorseRacingPath = "%s/HorseRacing" % MOUNT_PATH
-RunnerStartsDataPath = "%s/JSON" % HorseRacingPath
+# COMMAND ----------
 
-DataSetName = "OneRace"
+OneRaceBronzeDataSetName = "OneRace"
 
-# BROZNE SETTING 
-BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
-BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
-BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, DataSetName)
-BronzeTableName = 'Bronze' + DataSetName
+BronzeDataPath = f"{BronzeDataPathBase}/{OneRaceBronzeDataSetName}"
+BronzeCheckPointPath = f"{BronzeCheckPointPathBase}/OneRace"
+BronzeTableName = 'Tbl_Bronze' + OneRaceBronzeDataSetName
 
+# COMMAND ----------
+
+SourcePath = f"{RunnerStartsDataPath}/Databricks/OneRaceSelf"
 
 # COMMAND ----------
 
@@ -35,12 +33,11 @@ BronzeTableName = 'Bronze' + DataSetName
 
 # COMMAND ----------
 
-meetingDate = '2020-07-25' # THIS CAN BE ANY MEETING DATE
+# ! only one sameple file is not good enough. Due to inferred data type could be different from actual delta table. 
+# a number of sample files are required if you want to do 'Infer' schema from JSON files
+# i.e. runner.claimsAmount in Table is 'double', however, in some Json files, long type is inferred 
 
-sampleDF = (spark.read.option("inferSchema","true")
-          .option("header","true")
-          .json("/mnt/gamble/HorseRacing/JSON/%s/OneRace_Self_????-??-??_*.JSON" % meetingDate)
-           )
+sampleDF = read_json_schema(spark, f"{SourcePath}/OneRace_Self_2020-10-17_*_R.JSON")
 
 # COMMAND ----------
 
@@ -56,31 +53,44 @@ formSchema = sampleDF.schema
 
 # COMMAND ----------
 
-from pyspark.sql.functions import *
+formRawDF = read_stream_json(spark, SourcePath, formSchema)
 
-formRawDF = (spark.readStream
-             .format("json")
-             .schema(formSchema)
-             .load("/mnt/gamble/HorseRacing/JSON/20??-??-??/OneRace_Self_????-??-??_*.JSON")
-             .select(input_file_name().alias("fileName"), regexp_replace(input_file_name(), 'dbfs:/mnt/gamble/HorseRacing/JSON/(\d\d\d\d-\d\d-\d\d)/.*', "$1").alias("meetingDate"), "*")
+# COMMAND ----------
+
+formRawDF = (formRawDF
+             .select("*", regexp_replace("fileName", f"dbfs:{SourcePath}/OneRace_Self_(\d\d\d\d-\d\d-\d\d)_.*.JSON", "$1").alias("meetingDate"))
+            )
+
+# COMMAND ----------
+
+formRawWriter = create_stream_writer(
+  dataframe=formRawDF,
+  checkpoint=BronzeCheckPointPath,
+  name="write_raw_to_bronze_oneRace",
+  partition_column="meetingDate"
 )
 
 # COMMAND ----------
 
-(formRawDF.writeStream
- .trigger(once=True)
- .format("delta")
- .outputMode("append")
- .option("checkpointLocation", "%s" % BronzeCheckPointPath)
- .start("%s" % BronzeDataPath)
-)
+formRawWriter = formRawWriter.trigger(once=True)
+
+# COMMAND ----------
+
+formRawWriter.start(BronzeDataPath)
+
+# COMMAND ----------
+
+# allStreamFinished = until_all_streams_finished()
+
+# if allStreamFinished:
+#   print(f"HorseRacingOneRaceBronze is finished")
 
 # COMMAND ----------
 
 while spark.streams.active != []:
-  print("Waiting for streaming '%s' to finish." % BronzeDataPath)
+  print("Waiting for streaming query to finish.")
   time.sleep(5)
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
