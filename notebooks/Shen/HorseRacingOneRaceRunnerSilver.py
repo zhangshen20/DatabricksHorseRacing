@@ -114,10 +114,12 @@ oneRaceRunnerDF = (
 
 # COMMAND ----------
 
+import json, time, requests
+
 while spark.streams.active != []:
   print("Waiting for streaming '%s' to finish." % SilverDataPath)
   time.sleep(5)
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
