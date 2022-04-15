@@ -29,7 +29,7 @@ DataSetName = "RunnerStarts"
 BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
 BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
 BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "RunnerStartsV2")
+BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, "RunnerStarts")
 BronzeTableName = 'Bronze' + DataSetName
 
 
@@ -83,10 +83,12 @@ formRawDF = (spark.readStream
 
 # COMMAND ----------
 
+import json, time, requests
+
 while spark.streams.active != []:
   print("Waiting for streaming query to finish.")
   time.sleep(5)
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
