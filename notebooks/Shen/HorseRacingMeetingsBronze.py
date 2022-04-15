@@ -83,6 +83,8 @@ formRawDF = (spark.readStream
 
 # COMMAND ----------
 
+import json, time, requests
+
 while spark.streams.active != []:
   print("Waiting for streaming '%s' to finish." % BronzeDataPath)
   time.sleep(5)
