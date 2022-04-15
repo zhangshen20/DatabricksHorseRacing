@@ -1,13 +1,19 @@
 # Databricks notebook source
 # MAGIC %md 
 # MAGIC 
-# MAGIC ## Load RunnerStarts data from JSON files into Lake House (Delta)
+# MAGIC ## Load RunnerStarts data from Bronze into Silver (Delta)
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC 
 # MAGIC ### Initial Path Setting
+
+# COMMAND ----------
+
+from pyspark.sql.functions import udf, col, from_unixtime, from_utc_timestamp, from_json
+from pyspark.sql.types import StringType, StructField, StructType
+import json, time, requests
 
 # COMMAND ----------
 
@@ -156,3 +162,15 @@ runnerStartsDF = (
   .outputMode("append")
   .option("checkpointLocation", "%s" % SilverCheckPointPath)
   .start("%s" % SilverDataPath))
+
+# COMMAND ----------
+
+import json, time, requests
+
+while spark.streams.active != []:
+  print("Waiting for streaming query to finish.")
+  time.sleep(5)
+
+# COMMAND ----------
+
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
