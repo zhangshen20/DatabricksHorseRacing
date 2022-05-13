@@ -34,7 +34,7 @@ Create OR Replace temporary view Temp_view_OneRaceRatings AS select * from delta
 ;
 Create OR Replace temporary view Temp_view_RunnerPreviousStartsUnique AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique` 
 ;
-Create OR Replace temporary view Temp_view_RunnerStarts AS select distinct * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts` -- THIS Data got duplicated records. So we add DISTINCT
+Create OR Replace temporary view Temp_view_RunnerStarts AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts`
 ;
 Create OR Replace temporary view Temp_view_OneRaceResultRunner AS select * from delta.`/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner`
 ;
@@ -43,25 +43,25 @@ Create OR Replace temporary view Temp_view_RunnerWinningDistance AS select * fro
 
 -- COMMAND ----------
 
-# %python
+-- # %python
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner").createOrReplaceTempView("Temp_view_OneRaceRunner"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRunner").createOrReplaceTempView("Temp_view_OneRaceRunner"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/Meetings").createOrReplaceTempView("Temp_view_Meetings"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/Meetings").createOrReplaceTempView("Temp_view_Meetings"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRace").createOrReplaceTempView("Temp_view_OneRace"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRace").createOrReplaceTempView("Temp_view_OneRace"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions").createOrReplaceTempView("Temp_view_OneRacePredictions"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRacePredictions").createOrReplaceTempView("Temp_view_OneRacePredictions"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings").createOrReplaceTempView("Temp_view_OneRaceRatings"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceRatings").createOrReplaceTempView("Temp_view_OneRaceRatings"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique").createOrReplaceTempView("Temp_view_RunnerPreviousStartsUnique"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerPreviousStartsUnique").createOrReplaceTempView("Temp_view_RunnerPreviousStartsUnique"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts").createOrReplaceTempView("Temp_view_RunnerStarts"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerStarts").createOrReplaceTempView("Temp_view_RunnerStarts"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner").createOrReplaceTempView("Temp_view_OneRaceResultRunner"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/OneRaceResultRunner").createOrReplaceTempView("Temp_view_OneRaceResultRunner"))
 
-# (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance").createOrReplaceTempView("Temp_view_RunnerWinningDistance"))
+-- # (spark.read.format("delta").load("/mnt/gamble/DELTA/SILVER/DATA/RunnerWinningDistance").createOrReplaceTempView("Temp_view_RunnerWinningDistance"))
 
 
 -- COMMAND ----------
@@ -80,7 +80,7 @@ Create OR Replace view Temp_view_RunnerPreviousStartsRowNumber AS
 
 -- TESTING AND DEBUGGING -> Duplicated Record, View, Temp View.
 
--- select distinct * from temp_view_RunnerStarts where runnerName = 'ALKAASER' -- 2 same record
+-- select * from temp_view_RunnerStarts where runnerName = 'ALKAASER' -- 2 same record
 -- select * from Temp_view_RunnerPreviousStartsUnique where runnerName = 'ALKAASER' 
 -- select * from Temp_view_RunnerPreviousStartsRowNumber where runnerName = 'ALKAASER' 
 -- select * from Temp_view_RunnerPreviousStartsRowNumber where runnerName = 'ALKAASER' 
@@ -211,7 +211,7 @@ from  Temp_view_Meetings as L
        on L.meetingName = R4.meetingName and L.meetingDate = R4.meetingDate and L.raceNumber = R4.raceNumber and L.raceName = R4.raceName and R2.runnerNumber = R4.runnerNumber
       LEFT OUTER JOIN Temp_view_OneRaceResultRunner as R5
        on L.meetingName = R5.meetingName and L.meetingDate = R5.meetingDate and L.raceNumber = R5.raceNumber and L.raceType = R5.raceType and R2.runnerNumber = R5.runnerNumber
-      LEFT OUTER JOIN HorseRacing.view_RunnerStarts as R6
+      LEFT OUTER JOIN Temp_view_RunnerStarts as R6
        on L.meetingDate = R6.meetingDate and R2.runnerNumber = R6.runnerNumber and R2.runnerName = R6.runnerName and R2.trainerFullName = R6.trainerName
       LEFT OUTER JOIN Temp_view_RunnerPreviousStartsUnique as R7
        on L.meetingDate = R7.startDate and L.raceNumber = R7.raceNumber and R2.runnerName = R7.runnerName
@@ -234,19 +234,13 @@ from  Temp_view_Meetings as L
 
 -- COMMAND ----------
 
-# %python
-# df = spark.read.format('parquet').load("/mnt/gamble/DELTA/GOLD/DATA/RunnerMaster")
-
--- COMMAND ----------
-
-# %python
-# df.createOrReplaceTempView('temp_testing')
-
--- COMMAND ----------
-
--- select *
--- from temp_testing
--- where runnerName = 'ALKAASER'
+-- MAGIC %python
+-- MAGIC 
+-- MAGIC from datetime import datetime
+-- MAGIC 
+-- MAGIC now = datetime.now()
+-- MAGIC 
+-- MAGIC print(now, " *** This is end of Run for Horse Racing Data Catalog")
 
 -- COMMAND ----------
 

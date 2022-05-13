@@ -11,27 +11,15 @@
 
 # COMMAND ----------
 
-from pyspark.sql.functions import udf, col, from_unixtime, from_utc_timestamp, from_json
-from pyspark.sql.types import StringType, StructField, StructType
-import json, time, requests
+# MAGIC %run ./includes/configuration
 
 # COMMAND ----------
 
-MOUNT_NAME = "gamble"
-MOUNT_PATH = "/mnt/%s" % MOUNT_NAME
-
-HorseRacingPath = "%s/HorseRacing" % MOUNT_PATH
-RunnerStartsDataPath = "%s/JSON" % HorseRacingPath
-
 DataSetName = "Races"
 
-# BROZNE SETTING 
-BronzeDataPathBase = "/mnt/gamble/DELTA/BRONZE/DATA"
-BronzeCheckPointPathBase = "/mnt/gamble/DELTA/BRONZE/CHECKPOINT"
-BronzeDataPath = "%s/%s" % (BronzeDataPathBase, DataSetName)
-BronzeCheckPointPath = "%s/%s" % (BronzeCheckPointPathBase, DataSetName)
+BronzeDataPath = f"{BronzeDataPathBase}/{DataSetName}" 
+BronzeCheckPointPath = f"{BronzeCheckPointPathBase}/{DataSetName}"
 BronzeTableName = 'Bronze' + DataSetName
-
 
 # COMMAND ----------
 
@@ -82,6 +70,8 @@ formRawDF = (spark.readStream
 )
 
 # COMMAND ----------
+
+import json, time, requests
 
 while spark.streams.active != []:
   print("Waiting for streaming '%s' to finish." % BronzeDataPath)

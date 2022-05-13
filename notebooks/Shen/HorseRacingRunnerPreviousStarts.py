@@ -83,7 +83,7 @@ from pyspark.sql.functions import *
   "runner_previousStarts.margin",
   "runner_previousStarts.venueAbbreviation",
   "runner_previousStarts.skyRacing.audio",
-  "runner_previousStarts.skyRacing.previewVideo",
+#   "runner_previousStarts.skyRacing.previewVideo",
   "runner_previousStarts.skyRacing.Video",
   "runner_previousStarts.distance",
   "runner_previousStarts.class",
@@ -152,6 +152,7 @@ while spark.streams.active != []:
 # MAGIC           last(time) as time, 
 # MAGIC           last(stewardsComment) as stewardsComment
 # MAGIC   FROM    runner_previous_starts_temp
+# MAGIC   where   startType != 'Trial'
 # MAGIC   GROUP BY 
 # MAGIC           venueAbbreviation, 
 # MAGIC           startDate, 
@@ -171,6 +172,8 @@ while spark.streams.active != []:
 )
 
 # COMMAND ----------
+
+import json, time, requests
 
 while spark.streams.active != []:
   print("Waiting for streaming query to finish.")
