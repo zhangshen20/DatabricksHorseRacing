@@ -130,7 +130,7 @@ display(spark.sql("CREATE TABLE IF NOT EXISTS %s USING DELTA LOCATION '%s'" % (B
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE %s """ % BronzeRunnerResultTableName)
+# spark.sql(""" OPTIMIZE %s """ % BronzeRunnerResultTableName)
 
 # COMMAND ----------
 
@@ -449,4 +449,4 @@ WHEN NOT MATCHED
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE %s """ % SilverRunnerResultTableName)
+# spark.sql(""" OPTIMIZE %s """ % SilverRunnerResultTableName)

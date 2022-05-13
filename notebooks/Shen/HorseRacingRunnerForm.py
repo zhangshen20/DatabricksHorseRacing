@@ -89,4 +89,4 @@ while spark.streams.active != []:
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % BronzeDataPath)

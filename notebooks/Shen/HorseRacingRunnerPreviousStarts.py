@@ -106,22 +106,13 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
-# (runnerPreviousStartsDF.writeStream
-#   .trigger(once=True)
-#   .format("delta")
-#   .outputMode("append")
-#   .option("checkpointLocation", "%s" % SilverCheckPointPath)
-#   .start("%s" % SilverDataPath))
-
-# COMMAND ----------
-
 while spark.streams.active != []:
   print("Waiting for streaming query to finish.")
   time.sleep(5)
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
 
 # COMMAND ----------
 
@@ -135,13 +126,37 @@ spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
 # MAGIC %sql
 # MAGIC 
 # MAGIC CREATE OR REPLACE TEMP VIEW runner_previous_starts_unique_temp AS (
-# MAGIC   SELECT venueAbbreviation, startDate, raceNumber, runnerName, last(prizeMoney) as prizeMoney, last(last20Starts) as last20Starts, last(startType) as startType,
-# MAGIC          last(finishingPosition) as finishingPosition, last(numberOfStarters) as numberOfStarters, last(draw) as draw, last(margin) as margin, last(audio) as audio,
-# MAGIC          last(previewVideo) as previewVideo, last(Video) as Video, min(distance) as distance, last(class) as class, last(handicap) as handicap, last(rider) as rider,
-# MAGIC          last(startingPosition) as startingPosition, last(odds) as odds, last(winnerOrSecond) as winnerOrSecond, last(positionInRun) as positionInRun,
-# MAGIC          last(trackCondition) as trackCondition, last(time) as time, last(stewardsComment) as stewardsComment
-# MAGIC   FROM runner_previous_starts_temp
-# MAGIC   GROUP BY venueAbbreviation, startDate, raceNumber, runnerName
+# MAGIC   SELECT  venueAbbreviation, 
+# MAGIC           startDate, 
+# MAGIC           raceNumber, 
+# MAGIC           runnerName, 
+# MAGIC           last(prizeMoney) as prizeMoney, 
+# MAGIC           last(last20Starts) as last20Starts, 
+# MAGIC           last(startType) as startType,
+# MAGIC           last(finishingPosition) as finishingPosition, 
+# MAGIC           last(numberOfStarters) as numberOfStarters, 
+# MAGIC           last(draw) as draw, 
+# MAGIC           last(margin) as margin, 
+# MAGIC           last(audio) as audio,
+# MAGIC           last(previewVideo) as previewVideo, 
+# MAGIC           last(Video) as Video, 
+# MAGIC           min(distance) as distance, 
+# MAGIC           last(class) as class, 
+# MAGIC           last(handicap) as handicap, 
+# MAGIC           last(rider) as rider,
+# MAGIC           last(startingPosition) as startingPosition, 
+# MAGIC           last(odds) as odds, 
+# MAGIC           last(winnerOrSecond) as winnerOrSecond, 
+# MAGIC           last(positionInRun) as positionInRun,
+# MAGIC           last(trackCondition) as trackCondition, 
+# MAGIC           last(time) as time, 
+# MAGIC           last(stewardsComment) as stewardsComment
+# MAGIC   FROM    runner_previous_starts_temp
+# MAGIC   GROUP BY 
+# MAGIC           venueAbbreviation, 
+# MAGIC           startDate, 
+# MAGIC           raceNumber, 
+# MAGIC           runnerName
 # MAGIC )
 
 # COMMAND ----------
@@ -163,4 +178,4 @@ while spark.streams.active != []:
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPathUnique)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPathUnique)

@@ -88,4 +88,4 @@ riderPreviousStartsDF = (
 
 # COMMAND ----------
 
-spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
