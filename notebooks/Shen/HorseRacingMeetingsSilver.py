@@ -109,6 +109,8 @@ meetingsDF = (
 
 # COMMAND ----------
 
+# spark.sql(""" OPTIMIZE delta.`%s` """ % SilverDataPath)
+
 import json, time, requests
 
 while spark.streams.active != []:

@@ -106,15 +106,6 @@ from pyspark.sql.functions import *
 
 # COMMAND ----------
 
-# (runnerPreviousStartsDF.writeStream
-#   .trigger(once=True)
-#   .format("delta")
-#   .outputMode("append")
-#   .option("checkpointLocation", "%s" % SilverCheckPointPath)
-#   .start("%s" % SilverDataPath))
-
-# COMMAND ----------
-
 while spark.streams.active != []:
   print("Waiting for streaming query to finish.")
   time.sleep(5)
@@ -138,14 +129,16 @@ while spark.streams.active != []:
 # MAGIC   SELECT  venueAbbreviation, 
 # MAGIC           startDate, 
 # MAGIC           raceNumber, 
-# MAGIC           runnerName
-# MAGIC --      , last(prizeMoney) as prizeMoney, last(last20Starts) as last20Starts THIS 2 Fields do NOT reflect the right time for the previous races
-# MAGIC         , last(startType) as startType,
+# MAGIC           runnerName, 
+# MAGIC           last(prizeMoney) as prizeMoney, 
+# MAGIC           last(last20Starts) as last20Starts, 
+# MAGIC           last(startType) as startType,
 # MAGIC           last(finishingPosition) as finishingPosition, 
 # MAGIC           last(numberOfStarters) as numberOfStarters, 
-# MAGIC           last(draw) as draw, last(margin) as margin, 
+# MAGIC           last(draw) as draw, 
+# MAGIC           last(margin) as margin, 
 # MAGIC           last(audio) as audio,
-# MAGIC --           last(previewVideo) as previewVideo, 
+# MAGIC           last(previewVideo) as previewVideo, 
 # MAGIC           last(Video) as Video, 
 # MAGIC           min(distance) as distance, 
 # MAGIC           last(class) as class, 
@@ -160,7 +153,11 @@ while spark.streams.active != []:
 # MAGIC           last(stewardsComment) as stewardsComment
 # MAGIC   FROM    runner_previous_starts_temp
 # MAGIC   where   startType != 'Trial'
-# MAGIC   GROUP BY venueAbbreviation, startDate, raceNumber, runnerName
+# MAGIC   GROUP BY 
+# MAGIC           venueAbbreviation, 
+# MAGIC           startDate, 
+# MAGIC           raceNumber, 
+# MAGIC           runnerName
 # MAGIC )
 
 # COMMAND ----------
