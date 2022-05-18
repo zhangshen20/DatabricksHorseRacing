@@ -130,7 +130,8 @@ display(spark.sql("CREATE TABLE IF NOT EXISTS %s USING DELTA LOCATION '%s'" % (B
 
 # COMMAND ----------
 
-# spark.sql(""" OPTIMIZE %s """ % BronzeRunnerResultTableName)
+# use the legacy format in a newer version of spark(>3),
+spark.sql("set spark.sql.legacy.timeParserPolicy=LEGACY")
 
 # COMMAND ----------
 
